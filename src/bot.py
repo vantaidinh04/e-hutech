@@ -495,12 +495,12 @@ Các lệnh có sẵn:
             # Kiểm tra xem có statusCode không (thất bại)
             if result.get("has_status_code", False):
                 # Thất bại - có statusCode
-                await update.message.reply_text(f"❌ {result['message']}", reply_to_message_id=update.message.message_id)
+                await update.message.reply_text(result['message'], reply_to_message_id=update.message.message_id, parse_mode="Markdown")
             else:
                 # Thành công - không có statusCode
                 await update.message.reply_text(f"✅ {result['message']}", reply_to_message_id=update.message.message_id)
         else:
-            await update.message.reply_text(f"❌ {result['message']}", reply_to_message_id=update.message.message_id)
+            await update.message.reply_text(result['message'], reply_to_message_id=update.message.message_id, parse_mode="Markdown")
         
         # Xóa dữ liệu tạm thời
         context.user_data.clear()
@@ -518,67 +518,60 @@ Các lệnh có sẵn:
         
         if callback_data.startswith("num_"):
             # Xử lý các nút số
-            if callback_data == "num_back":
+            if callback_data == "num_exit":
+                # Thoát khỏi menu điểm danh
+                await query.edit_message_text("Đã hủy điểm danh.")
+                context.user_data.clear()
+                return
+            elif callback_data == "num_delete":
                 # Xóa ký tự cuối cùng
                 if len(current_input) > 0:
                     current_input = current_input[:-1]
-            elif callback_data == "num_confirm":
-                # Xác nhận nhập số
-                if len(current_input) == 4:
-                    # Lấy campus đã chọn từ context
-                    campus_name = context.user_data.get("selected_campus")
-                    
-                    if campus_name:
-                        # Thực hiện điểm danh
-                        result = await self.diem_danh_handler.handle_submit_diem_danh(user_id, current_input, campus_name)
-                        
-                        if result["success"]:
-                            # Kiểm tra xem có statusCode không (thất bại)
-                            if result.get("has_status_code", False):
-                                # Thất bại - có statusCode
-                                await query.edit_message_text(f"❌ {result['message']}")
-                            else:
-                                # Thành công - không có statusCode
-                                await query.edit_message_text(f"✅ {result['message']}")
-                        else:
-                            await query.edit_message_text(f"❌ {result['message']}")
-                        
-                        # Xóa dữ liệu tạm thời
-                        context.user_data.clear()
-                        return
-                    else:
-                        await query.edit_message_text("❌ Lỗi: Không tìm thấy campus đã chọn.")
-                        return
-                else:
-                    await query.answer("Vui lòng nhập đủ 4 số!", show_alert=True)
-                    return
             else:
                 # Thêm số vào chuỗi hiện tại
-                digit = callback_data[4:]  # Bỏ "num_" prefix
+                digit = callback_data[4:]
                 if len(current_input) < 4:
                     current_input += digit
-        
-        # Cập nhật trạng thái nhập số
-        context.user_data["numeric_input"] = current_input
-        
-        # Hiển thị trạng thái nhập số mới
-        display = self.diem_danh_handler.format_diem_danh_numeric_display(current_input)
-        
-        # Cập nhật tin nhắn
-        campus_name = context.user_data.get("selected_campus", "Campus")
-        message = self.diem_danh_handler.format_diem_danh_numeric_message(campus_name)
-        
-        # Tạo bàn phím số
-        keyboard = self.diem_danh_handler.format_diem_danh_numeric_keyboard()
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        
-        await query.edit_message_text(
-            text=f"{message}\n\n{display}",
-            reply_markup=reply_markup,
-            parse_mode="Markdown"
-        )
-        
-        # Đánh dấu callback đã được xử lý
+
+            # Cập nhật trạng thái nhập số
+            context.user_data["numeric_input"] = current_input
+
+            # Nếu đã nhập đủ 4 số, tự động gửi
+            if len(current_input) == 4:
+                campus_name = context.user_data.get("selected_campus")
+                if campus_name:
+                    # Hiển thị thông báo đang gửi
+                    await query.edit_message_text("Đang gửi mã điểm danh...")
+                    
+                    result = await self.diem_danh_handler.handle_submit_diem_danh(user_id, current_input, campus_name)
+                    
+                    if result["success"]:
+                        if result.get("has_status_code", False):
+                            await query.edit_message_text(result['message'], parse_mode="Markdown")
+                        else:
+                            await query.edit_message_text(f"✅ {result['message']}")
+                    else:
+                        await query.edit_message_text(result['message'], parse_mode="Markdown")
+                    
+                    context.user_data.clear()
+                    return
+                else:
+                    await query.edit_message_text("❌ Lỗi: Không tìm thấy campus đã chọn.")
+                    return
+
+            # Cập nhật hiển thị
+            display = self.diem_danh_handler.format_diem_danh_numeric_display(current_input)
+            campus_name = context.user_data.get("selected_campus", "Campus")
+            message = self.diem_danh_handler.format_diem_danh_numeric_message(campus_name)
+            keyboard = self.diem_danh_handler.format_diem_danh_numeric_keyboard()
+            reply_markup = InlineKeyboardMarkup(keyboard)
+
+            await query.edit_message_text(
+                text=f"{message}\n\n{display}",
+                reply_markup=reply_markup,
+                parse_mode="Markdown"
+            )
+
         await query.answer()
     
     async def hoc_phan_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

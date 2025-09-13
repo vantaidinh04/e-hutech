@@ -124,15 +124,11 @@ class DiemDanhHandler:
                 # Kiểm tra nếu có statusCode (thất bại)
                 if "statusCode" in response_data:
                     statusCode = response_data.get("statusCode")
-                    # Nếu là statusCode 422, hiển thị thông báo đơn giản
-                    if statusCode == 422:
-                        message = "Qr không tồn tại hoặc hết hạn"
-                    else:
-                        message = response_data.get("reasons", {}).get("message", "Điểm danh thất bại")
+                    message = response_data.get("reasons", {}).get("message", "Điểm danh thất bại")
                     
                     return {
                         "success": False,
-                        "message": f"🚫 *Điểm danh thất bại*\n\n{message}",
+                        "message": f"❌ *Điểm danh thất bại*\n\n{message}",
                         "data": response_data,
                         "has_status_code": True,
                         "show_back_button": True
@@ -140,15 +136,11 @@ class DiemDanhHandler:
                 # Kiểm tra nếu có error từ API call
                 elif response_data.get("error") and "status_code" in response_data:
                     statusCode = response_data.get("status_code")
-                    # Nếu là statusCode 422, hiển thị thông báo đơn giản
-                    if statusCode == 422:
-                        message = "Qr không tồn tại hoặc hết hạn"
-                    else:
-                        message = response_data.get("message", "Điểm danh thất bại")
+                    message = response_data.get("message", "Điểm danh thất bại")
                     
                     return {
                         "success": False,
-                        "message": f"🚫 *Điểm danh thất bại*\n\n{message}",
+                        "message": f"❌ *Điểm danh thất bại*\n\n{message}",
                         "data": response_data,
                         "has_status_code": True,
                         "show_back_button": True
@@ -393,7 +385,7 @@ class DiemDanhHandler:
         """
         try:
             message = f"📍 *Điểm Danh Tại {campus_name}*\n\n"
-            message += "Nhập mã QR điểm danh:"
+            message += "Nhập mã điểm danh:"
             
             return message
         
@@ -432,11 +424,11 @@ class DiemDanhHandler:
                 {"text": "9", "callback_data": "num_9"}
             ])
             
-            # Hàng 4: X 0 ✓
+            # Hàng 4: Thoát 0 Xoá
             keyboard.append([
-                {"text": "↶", "callback_data": "num_back"},
+                {"text": "Thoát", "callback_data": "num_exit"},
                 {"text": "0", "callback_data": "num_0"},
-                {"text": "✓", "callback_data": "num_confirm"}
+                {"text": "Xoá", "callback_data": "num_delete"}
             ])
             
             return keyboard
