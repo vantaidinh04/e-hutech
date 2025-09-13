@@ -38,8 +38,7 @@ Bot Telegram đa chức năng giúp sinh viên HUTECH truy cập thông tin họ
 ## 🛠️ Công nghệ sử dụng
 
 -   [Python](https://www.python.org/)
--   [python-telegram-bot](https://python-telegram-bot.org/)
--   [SQLite](https://www.sqlite.org/index.html)
+-   [Postges](https://www.postgresql.org/)
 -   [Redis](https://redis.io/)
 -   [Docker](https://www.docker.com/)
 
