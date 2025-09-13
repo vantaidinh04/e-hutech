@@ -22,7 +22,7 @@ Bot Telegram đa chức năng giúp sinh viên HUTECH truy cập thông tin họ
 1.  **Clone repo:**
     ```bash
     git clone https://github.com/vantaidinh04/e-hutech.git
-    cd e-hutech
+    cd e-hutech/src
     ```
 2.  **Cấu hình:** Sao chép `.env.example` thành `.env` và điền `TELEGRAM_BOT_TOKEN` của bạn.
 3.  **Chạy với Docker (Khuyến khích):**
@@ -31,8 +31,8 @@ Bot Telegram đa chức năng giúp sinh viên HUTECH truy cập thông tin họ
     ```
 4.  **Chạy cục bộ:**
     ```bash
-    pip install -r src/requirements.txt
-    python src/bot.py
+    pip install -r requirements.txt
+    python bot.py
     ```
 
 ## 🛠️ Công nghệ sử dụng

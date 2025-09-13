@@ -14,7 +14,7 @@ from icalendar import Calendar, Event
 import pytz
 import os
 
-from src.config.config import Config
+from config.config import Config
 
 logger = logging.getLogger(__name__)
 

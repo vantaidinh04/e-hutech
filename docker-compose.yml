@@ -21,7 +21,7 @@ services:
     build:
       context: .
       dockerfile: src/Dockerfile
-    image: hutech-bot:latest
+    image: hutech-bot
     container_name: hutech-bot
     restart: unless-stopped
     env_file:

@@ -12,7 +12,7 @@ from datetime import datetime
 
 import redis.asyncio as redis
 
-from src.config.config import Config
+from config.config import Config
 
 logger = logging.getLogger(__name__)
 

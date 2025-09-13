@@ -15,7 +15,7 @@ from datetime import datetime, timedelta
 import openpyxl
 from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
 
-from src.config.config import Config
+from config.config import Config
 
 logger = logging.getLogger(__name__)
 
