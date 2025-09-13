@@ -31,8 +31,8 @@ Bot Telegram đa chức năng giúp sinh viên HUTECH truy cập thông tin họ
     ```
 4.  **Chạy cục bộ:**
     ```bash
-    pip install -r requirements.txt
-    python bot.py
+    pip install -r src/requirements.txt
+    python src/bot.py
     ```
 
 ## 🛠️ Công nghệ sử dụng
