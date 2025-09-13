@@ -4,13 +4,13 @@ FROM python:latest
 WORKDIR /app
 
 # Copy requirements first for better caching
-COPY requirements.txt .
+COPY src/requirements.txt .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application
-COPY . .
+COPY src/ .
 
 # Command to run the bot
 CMD ["python", "bot.py"]

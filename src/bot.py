@@ -12,23 +12,21 @@ import sys
 import asyncio
 from pathlib import Path
 
-# Thêm thư mục src vào đường dẫn Python
-sys.path.append(str(Path(__file__).parent / "src"))
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, ConversationHandler, CallbackQueryHandler
 
-from src.config.config import Config
-from src.database.db_manager import DatabaseManager
-from src.cache.cache_manager import CacheManager
-from src.handlers.login_handler import LoginHandler
-from src.handlers.logout_handler import LogoutHandler
-from src.handlers.tkb_handler import TkbHandler
-from src.handlers.lich_thi_handler import LichThiHandler
-from src.handlers.diem_handler import DiemHandler
-from src.handlers.hoc_phan_handler import HocPhanHandler
-from src.handlers.diem_danh_handler import DiemDanhHandler
-from src.utils.utils import generate_uuid
+from config.config import Config
+from database.db_manager import DatabaseManager
+from cache.cache_manager import CacheManager
+from handlers.login_handler import LoginHandler
+from handlers.logout_handler import LogoutHandler
+from handlers.tkb_handler import TkbHandler
+from handlers.lich_thi_handler import LichThiHandler
+from handlers.diem_handler import DiemHandler
+from handlers.hoc_phan_handler import HocPhanHandler
+from handlers.diem_danh_handler import DiemDanhHandler
+from utils.utils import generate_uuid
 
 # Cấu hình logging
 logging.basicConfig(

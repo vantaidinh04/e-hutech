@@ -18,12 +18,14 @@ services:
     restart: unless-stopped
 
   hutech-bot:
-    build: .
+    build:
+      context: .
+      dockerfile: src/Dockerfile
     image: hutech-bot:latest
     container_name: hutech-bot
     restart: unless-stopped
     env_file:
-      - .env
+      - src/.env
     depends_on:
       - postgres
       - redis
