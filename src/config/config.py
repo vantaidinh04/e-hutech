@@ -33,7 +33,7 @@ class Config:
         self.HUTECH_DIEM_DANH_SUBMIT_ENDPOINT = "/api-elearning/api/qr-code/submit"
         
         # Headers cho API
-        self.HUTECH_HEADERS = {
+        self.HUTECH_STUDENT_HEADERS = {
             "user-agent": "Dart/3.5 (dart:io)",
             "app-key": "SINHVIEN_DAIHOC",
             "content-type": "application/json"

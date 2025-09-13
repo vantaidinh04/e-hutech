@@ -99,7 +99,7 @@ class LoginHandler:
         """
         try:
             url = f"{self.config.HUTECH_API_BASE_URL}{self.config.HUTECH_LOGIN_ENDPOINT}"
-            headers = self.config.HUTECH_HEADERS.copy()
+            headers = self.config.HUTECH_STUDENT_HEADERS.copy()
             
             async with aiohttp.ClientSession() as session:
                 async with session.post(

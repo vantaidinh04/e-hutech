@@ -105,7 +105,7 @@ class LogoutHandler:
         """
         try:
             url = f"{self.config.HUTECH_API_BASE_URL}{self.config.HUTECH_LOGOUT_ENDPOINT}"
-            headers = self.config.HUTECH_HEADERS.copy()
+            headers = self.config.HUTECH_STUDENT_HEADERS.copy()
             headers["authorization"] = f"JWT {token}"
             
             async with aiohttp.ClientSession() as session:
