@@ -475,33 +475,104 @@ Các lệnh có sẵn:
         """Nhận mã QR từ người dùng và thực hiện điểm danh"""
         user_id = update.effective_user.id
         code = update.message.text.strip()
-        
+
         # Kiểm tra xem người dùng có đang trong trạng thái điểm danh không
         if "selected_campus" not in context.user_data:
             # Người dùng không đang trong trạng thái điểm danh, bỏ qua
             return
-        
-        # Lấy campus đã chọn từ context
+
+        # Lấy campus đã chọn và message_id của menu
         campus_name = context.user_data.get("selected_campus")
-        
+        numeric_message_id = context.user_data.get("numeric_message_id")
+
         if not campus_name:
             await update.message.reply_text("Lỗi: Không tìm thấy campus đã chọn. Vui lòng thử lại.", reply_to_message_id=update.message.message_id)
             return
-        
+
+        # Xóa tin nhắn chứa mã QR của người dùng
+        try:
+            await update.message.delete()
+        except Exception as e:
+            logger.warning(f"Không thể xóa tin nhắn mã QR: {e}")
+
+        # Kiểm tra mã điểm danh
+        if not code.isdigit() or len(code) != 4:
+            # Xóa tin nhắn menu cũ
+            if numeric_message_id:
+                try:
+                    await context.bot.delete_message(
+                        chat_id=update.effective_chat.id,
+                        message_id=numeric_message_id
+                    )
+                except Exception as e:
+                    logger.warning(f"Không thể xóa tin nhắn menu điểm danh: {e}")
+            
+            # Gửi thông báo lỗi và lưu message_id
+            error_message = await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text="Mã điểm danh phải là 4 chữ số. Vui lòng nhập lại."
+            )
+            context.user_data["diemdanh_error_message_id"] = error_message.message_id
+
+            # Gửi lại menu nhập mã
+            message = self.diem_danh_handler.format_diem_danh_numeric_message(campus_name)
+            keyboard = self.diem_danh_handler.format_diem_danh_numeric_keyboard()
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            display = self.diem_danh_handler.format_diem_danh_numeric_display("")
+            
+            new_menu_message = await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text=f"{message}\n\n{display}",
+                reply_markup=reply_markup,
+                parse_mode="Markdown"
+            )
+            context.user_data["numeric_message_id"] = new_menu_message.message_id
+            context.user_data["numeric_input"] = ""
+            return
+
+        # Xóa tin nhắn lỗi nếu có
+        error_message_id = context.user_data.pop("diemdanh_error_message_id", None)
+        if error_message_id:
+            try:
+                await context.bot.delete_message(
+                    chat_id=update.effective_chat.id,
+                    message_id=error_message_id
+                )
+            except Exception as e:
+                logger.warning(f"Không thể xóa tin nhắn lỗi điểm danh: {e}")
+
+        # Xóa tin nhắn menu bàn phím số
+        if numeric_message_id:
+            try:
+                await context.bot.delete_message(
+                    chat_id=update.effective_chat.id,
+                    message_id=numeric_message_id
+                )
+            except Exception as e:
+                logger.warning(f"Không thể xóa tin nhắn menu điểm danh: {e}")
+
+        # Gửi tin nhắn tạm thời
+        processing_message = await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="Đang gửi mã điểm danh..."
+        )
+
         # Thực hiện điểm danh
         result = await self.diem_danh_handler.handle_submit_diem_danh(user_id, code, campus_name)
-        
-        if result["success"]:
-            # Kiểm tra xem có statusCode không (thất bại)
-            if result.get("has_status_code", False):
-                # Thất bại - có statusCode
-                await update.message.reply_text(result['message'], reply_to_message_id=update.message.message_id, parse_mode="Markdown")
+
+        # Cập nhật tin nhắn với kết quả
+        try:
+            if result["success"]:
+                if result.get("has_status_code", False):
+                    await processing_message.edit_text(result['message'], parse_mode="Markdown")
+                else:
+                    await processing_message.edit_text(f"✅ {result['message']}")
             else:
-                # Thành công - không có statusCode
-                await update.message.reply_text(f"✅ {result['message']}", reply_to_message_id=update.message.message_id)
-        else:
-            await update.message.reply_text(result['message'], reply_to_message_id=update.message.message_id, parse_mode="Markdown")
-        
+                await processing_message.edit_text(result['message'], parse_mode="Markdown")
+        except Exception:
+            # Nếu lỗi parse Markdown, gửi lại dưới dạng text thường
+            await processing_message.edit_text(result['message'])
+
         # Xóa dữ liệu tạm thời
         context.user_data.clear()
     

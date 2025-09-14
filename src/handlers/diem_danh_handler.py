@@ -263,7 +263,7 @@ class DiemDanhHandler:
             True nếu lưu thành công, False nếu có lỗi
         """
         try:
-            return self.db_manager.save_diem_danh_submit_response(telegram_user_id, save_data)
+            return self.db_manager.save_diem_danh_response(telegram_user_id, save_data)
         except Exception as e:
             logger.error(f"Error saving điểm danh submit response for user {telegram_user_id}: {e}")
             return False
