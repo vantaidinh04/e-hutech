@@ -9,6 +9,13 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d db_name"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - hutech-bot-network
 
   redis:
     image: redis:latest
@@ -16,20 +23,40 @@ services:
     volumes:
       - redis_data:/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - hutech-bot-network
 
   hutech-bot:
     build:
       context: .
-      dockerfile: src/Dockerfile
     image: hutech-bot
     container_name: hutech-bot
     restart: unless-stopped
     env_file:
-      - src/.env
+      - .env
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import asyncio; import sys; sys.path.append('/app'); from bot import HutechBot; bot = HutechBot(); asyncio.run(bot.db_manager.connect()); asyncio.run(bot.cache_manager.connect()); print('Health check passed')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - hutech-bot-network
 
 volumes:
   postgres_data:
   redis_data:
+
+networks:
+  hutech-bot-network:
+    driver: bridge

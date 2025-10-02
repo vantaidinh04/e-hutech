@@ -36,9 +36,9 @@ Bot Telegram đa chức năng được thiết kế dành riêng cho sinh viên 
 2.  **Cấu hình môi trường:**
     Sao chép tệp cấu hình mẫu và điền thông tin cần thiết.
     ```bash
-    cp src/.env.example src/.env
+    cp .env.example .env
     ```
-    Sau đó, mở tệp `src/.env` và điền `TELEGRAM_BOT_TOKEN` của bạn.
+    Sau đó, mở tệp `.env` và điền `TELEGRAM_BOT_TOKEN` của bạn.
 
 ### Lựa chọn 1: Chạy với Docker (Khuyến khích)
 
@@ -48,27 +48,40 @@ Bot Telegram đa chức năng được thiết kế dành riêng cho sinh viên 
     ```bash
     docker-compose up --build -d
     ```
+    Lệnh này sẽ:
+    - Tạo và khởi động các container cho PostgreSQL, Redis và bot
+    - Tự động kiểm tra sức khỏe của các dịch vụ
+    - Bot sẽ chỉ khởi động sau khi PostgreSQL và Redis sẵn sàng
 
 2.  **Kiểm tra logs (tùy chọn):**
     ```bash
-    docker-compose logs -f
+    docker-compose logs -f hutech-bot  # Chỉ xem logs của bot
+    docker-compose logs -f            # Xem logs của tất cả services
     ```
 
-3.  **Dừng bot:**
+3.  **Kiểm tra trạng thái các container:**
     ```bash
-    docker-compose down
+    docker-compose ps
+    ```
+
+4.  **Dừng bot:**
+    ```bash
+    docker-compose down    # Dừng và xóa containers
+    docker-compose down -v # Dừng và xóa containers kèm volumes
+    ```
+
+5.  **Khởi động lại sau khi thay
+    ```bash
+    docker-compose up --build -d --force-recreate
     ```
 
 ### Lựa chọn 2: Chạy ở môi trường cục bộ
 
 Phương pháp này phù hợp cho việc phát triển và gỡ lỗi.
 
-1.  **Di chuyển vào thư mục `src`:**
-    ```bash
-    cd src
-    ```
+**Lưu ý:** Bạn cần cài đặt và chạy PostgreSQL và Redis trên máy local trước khi chạy bot.
 
-2.  **Tạo và kích hoạt môi trường ảo:**
+1.  **Tạo và kích hoạt môi trường ảo:**
     -   **Trên macOS/Linux:**
         ```bash
         python3 -m venv venv
@@ -80,17 +93,17 @@ Phương pháp này phù hợp cho việc phát triển và gỡ lỗi.
         .\venv\Scripts\activate
         ```
 
-3.  **Cài đặt các thư viện cần thiết:**
+2.  **Cài đặt các thư viện cần thiết:**
     ```bash
     pip install -r requirements.txt
     ```
 
-4.  **Khởi chạy bot:**
+3.  **Khởi chạy bot:**
     ```bash
     python bot.py
     ```
 
-5.  **Ngắt kích hoạt môi trường ảo khi hoàn tất:**
+4.  **Ngắt kích hoạt môi trường ảo khi hoàn tất:**
     ```bash
     deactivate
     ```
