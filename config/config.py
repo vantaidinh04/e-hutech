@@ -11,8 +11,11 @@ from dotenv import load_dotenv
 
 class Config:
     def __init__(self):
-        # Tải biến môi trường từ file .env
-        load_dotenv()
+        # Tải biến môi trường từ file .env (chỉ khi chạy local)
+        # Trong Docker, biến môi trường đã được thiết lập sẵn
+        env_path = Path('.env')
+        if env_path.exists():
+            load_dotenv()
         
         # Token của bot Telegram
         self.TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
